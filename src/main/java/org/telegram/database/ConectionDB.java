@@ -17,15 +17,15 @@ import java.sql.*;
  * @version 2.0
  * Connector to database
  */
-public class ConectionDB {
+public class ConnectionDB {
     private static final String LOGTAG = "CONNECTIONDB";
-    private Connection currentConection;
+    private Connection currentConnection;
 
-    public ConectionDB() {
-        this.currentConection = openConexion();
+    public ConnectionDB() {
+        this.currentConnection = openConnection();
     }
 
-    private Connection openConexion() {
+    private Connection openConnection() {
         Connection connection = null;
         try {
             Class.forName(BuildVars.controllerDB).newInstance();
@@ -37,9 +37,9 @@ public class ConectionDB {
         return connection;
     }
 
-    public void closeConexion() {
+    public void closeConnection() {
         try {
-            this.currentConection.close();
+            this.currentConnection.close();
         } catch (SQLException e) {
             BotLogger.error(LOGTAG, e);
         }
@@ -48,27 +48,27 @@ public class ConectionDB {
 
     public ResultSet runSqlQuery(String query) throws SQLException {
         final Statement statement;
-        statement = this.currentConection.createStatement();
+        statement = this.currentConnection.createStatement();
         return statement.executeQuery(query);
     }
 
     public Boolean executeQuery(String query) throws SQLException {
-        final Statement statement = this.currentConection.createStatement();
+        final Statement statement = this.currentConnection.createStatement();
         return statement.execute(query);
     }
 
     public PreparedStatement getPreparedStatement(String query) throws SQLException {
-        return this.currentConection.prepareStatement(query);
+        return this.currentConnection.prepareStatement(query);
     }
 
     public PreparedStatement getPreparedStatement(String query, int flags) throws SQLException {
-        return this.currentConection.prepareStatement(query, flags);
+        return this.currentConnection.prepareStatement(query, flags);
     }
 
     public int checkVersion() {
         int max = 0;
         try {
-            final DatabaseMetaData metaData = this.currentConection.getMetaData();
+            final DatabaseMetaData metaData = this.currentConnection.getMetaData();
             final ResultSet res = metaData.getTables(null, null, "",
                     new String[]{"TABLE"});
             while (res.next()) {
@@ -90,7 +90,7 @@ public class ConectionDB {
      * @throws SQLException If initialization fails
      */
     public void initTransaction() throws SQLException {
-        this.currentConection.setAutoCommit(false);
+        this.currentConnection.setAutoCommit(false);
     }
 
     /**
@@ -99,13 +99,13 @@ public class ConectionDB {
      */
     public void commitTransaction() throws SQLException {
         try {
-            this.currentConection.commit();
+            this.currentConnection.commit();
         } catch (SQLException e) {
-            if (this.currentConection != null) {
-                this.currentConection.rollback();
+            if (this.currentConnection != null) {
+                this.currentConnection.rollback();
             }
         } finally {
-            this.currentConection.setAutoCommit(false);
+            this.currentConnection.setAutoCommit(false);
         }
     }
 }
